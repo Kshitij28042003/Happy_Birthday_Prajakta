@@ -1,0 +1,526 @@
+<title>Happy Birthday Prajakta</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one scene at a time, like a mission log. HUD labels in mono; lane-yellow, lidar-cyan and birthday-pink on asphalt. Single dark look by choice. */
+:root{
+  --asphalt:#14161f;
+  --asphalt-2:#1d2030;
+  --line:#2c3045;
+  --fg:#f3efe6;
+  --muted:#9ea3b8;
+  --lane:#f5c84b;
+  --lidar:#5ee6d0;
+  --pink:#ff7aa8;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{
+  background:var(--asphalt);color:var(--fg);font-family:var(--display);font-size:16px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  overflow-x:hidden;
+}
+.stage{max-width:820px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding-block:20px 28px;gap:20px}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dots{display:flex;gap:6px}
+.dots span{width:22px;height:4px;border-radius:2px;background:var(--line);transition:background .3s}
+.dots span.on{background:var(--lane)}
+.music{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
+.music[aria-pressed="true"]{border-color:var(--pink);color:var(--pink)}
+button:focus-visible{outline:2px solid var(--lidar);outline-offset:3px}
+
+.scene{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px;animation:rise .6s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lidar)}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.1}
+h2{font-size:clamp(28px,6vw,44px);font-weight:800}
+p{margin:0;max-width:60ch}
+.lead{font-size:18px;color:var(--muted)}
+
+/* Scene 1 */
+.namebtn{
+  align-self:flex-start;font-family:var(--display);font-weight:800;font-size:clamp(56px,16vw,128px);letter-spacing:-.03em;line-height:.95;
+  color:var(--fg);background:none;border:0;padding:0;cursor:pointer;position:relative;text-align:left;
+}
+.namebtn::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:6px;
+  background:repeating-linear-gradient(90deg,var(--lane) 0 28px,transparent 28px 44px);animation:dash 1.2s linear infinite}
+@keyframes dash{to{background-position:44px 0}}
+.namebtn:hover{color:var(--pink)}
+.hint{font-family:var(--mono);font-size:13px;color:var(--lane)}
+
+/* Scene 2 */
+.typed{font-size:clamp(22px,4.6vw,34px);font-weight:700;min-height:3.4em;text-wrap:balance;line-height:1.2}
+.typed em{font-style:normal;color:var(--lidar)}
+.typed b{color:var(--pink);font-weight:800}
+.typed .caret{display:inline-block;width:.08em;height:1em;background:var(--lane);vertical-align:-.12em;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.sim{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start}
+.sim > *{min-width:0}
+canvas#field{width:100%;aspect-ratio:1/1;max-width:100%;border-radius:14px;background:var(--asphalt-2);display:block}
+.paper{display:flex;flex-direction:column;gap:12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;position:relative;overflow:hidden}
+.tab.on{color:var(--asphalt);background:var(--lane);border-color:var(--lane);font-weight:600}
+.venue{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--lidar)}
+.paper h3{font-size:19px;font-weight:700}
+.paper p{color:var(--muted);font-size:15px}
+.paper p b{color:var(--fg);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+
+/* Scene 3 */
+.facts{display:grid;gap:4px;list-style:none;margin:0;padding:0}
+.facts li{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:baseline;padding:14px 0;border-bottom:1px dashed var(--line);opacity:0;animation:rise .5s ease forwards}
+.facts .k{font-family:var(--mono);font-size:12px;color:var(--lane);letter-spacing:.06em;min-width:8ch}
+
+/* Scene 4 */
+.letter{font-size:20px;line-height:1.6;max-width:56ch}
+.letter p + p{margin-top:14px}
+.sign{font-family:var(--mono);color:var(--pink);font-size:14px;margin-top:6px}
+
+/* Scene 5 */
+.finale{align-items:center;text-align:center}
+.cake{position:relative;width:min(260px,70vw);aspect-ratio:13/12;max-width:100%}
+.cake .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:10px 10px 6px 6px}
+.cake .t1{bottom:0;width:100%;height:40%;background:var(--pink)}
+.cake .t2{bottom:38%;width:72%;height:30%;background:var(--fg)}
+.cake .t1::after{content:"";position:absolute;inset:18% 0 auto;height:14%;background:repeating-linear-gradient(90deg,var(--lane) 0 10%,transparent 10% 20%)}
+.cake .t2::after{content:"P";position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:clamp(22px,6vw,32px);color:var(--pink)}
+.candles{position:absolute;bottom:66%;left:50%;transform:translateX(-50%);display:flex;gap:22px}
+.candle{width:12px;height:46px;background:repeating-linear-gradient(160deg,var(--lidar) 0 6px,var(--fg) 6px 12px);border-radius:3px;position:relative;cursor:pointer;border:0;padding:0}
+.candle::before{content:"";position:absolute;left:50%;top:-24px;width:14px;height:22px;transform:translateX(-50%);
+  background:radial-gradient(circle at 50% 70%,#fff6c2 0 25%,var(--lane) 45%,transparent 72%);border-radius:50% 50% 45% 45%;animation:flicker .18s infinite alternate}
+.candle.out::before{display:none}
+.candle.out::after{content:"";position:absolute;left:50%;top:-30px;width:3px;height:22px;background:var(--muted);opacity:.5;filter:blur(2px);animation:smoke 1.4s forwards}
+@keyframes flicker{to{transform:translateX(-50%) scale(1.08,.94)}}
+@keyframes smoke{to{transform:translateY(-20px);opacity:0}}
+.big{font-size:clamp(40px,11vw,84px);font-weight:800;letter-spacing:-.02em;line-height:1.05}
+.big span{color:var(--pink)}
+#confetti{position:fixed;inset:0;pointer-events:none;width:100%;height:100%}
+
+.nav{display:flex;justify-content:space-between;gap:12px}
+.btn{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:12px 20px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--fg)}
+.btn.go{background:var(--lane);color:var(--asphalt);border-color:var(--lane);font-weight:600}
+
+@media (max-width:640px){.sim{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.scene,.facts li,.namebtn::after,.candle::before{animation-duration:.01ms!important;animation-iteration-count:1!important}.facts li{opacity:1}}
+</style>
+
+<div class="stage">
+  <div class="hud">
+    <div class="dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    <button class="music" id="music" aria-pressed="false">♪ Play song</button>
+  </div>
+
+  <!-- 1 -->
+  <section class="scene" data-scene="0">
+    <div class="eyebrow" id="bday">10 · November · Birthday mode: on</div>
+    <p class="lead">Someone special was born today. Tap her name.</p>
+    <button class="namebtn" id="nameBtn">Prajakta</button>
+    <p class="hint">→ tap to begin</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="scene" data-scene="1" hidden>
+    <div class="eyebrow">Identity confirmed · Prajakta Surve</div>
+    <div class="typed" id="typed"></div>
+    <div class="sim">
+      <canvas id="field" aria-label="Animated scenes from Prajakta's three papers"></canvas>
+      <div class="paper">
+        <div class="tabs" role="tablist">
+          <button class="tab" data-act="0" role="tab">01 Chase</button>
+          <button class="tab" data-act="1" role="tab">02 Hide</button>
+          <button class="tab" data-act="2" role="tab">03 Arrive</button>
+        </div>
+        <div class="venue" id="venue"></div>
+        <h3 id="ptitle"></h3>
+        <p id="pplain"></p>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="scene" data-scene="2" hidden>
+    <div class="eyebrow">Field observations</div>
+    <h2>Things we've learned from Prajakta</h2>
+    <ul class="facts" id="facts">
+      <li><span class="k">LEMMA 1</span><span>If a deadline moves slower than her critical speed, capture is guaranteed.</span></li>
+      <li><span class="k">LEMMA 2</span><span>Never play hide-and-seek with her. She has already computed the value of information.</span></li>
+      <li><span class="k">LEMMA 3</span><span>Wherever you go, you stay inside her sensing radius. That's what good seniors do.</span></li>
+      <li><span class="k">THEOREM</span><span>Being her friend is a game where every player wins. Proof via Apollonius circle, left to the reader.</span></li>
+    </ul>
+  </section>
+
+  <!-- 4 -->
+  <section class="scene" data-scene="3" hidden>
+    <div class="eyebrow">Incoming message</div>
+    <div class="letter">
+      <p>Dear Prajakta,</p>
+      <p>From guidance laws at IIT Bombay to pursuit games at Michigan State, you make hard problems look elegant. Thank you for being the senior who always has time to explain things twice, and the friend who makes long research days feel short.</p>
+      <p>May this year bring you converging simulations, quick acceptances, and lots of time with no deadlines in pursuit. Happy birthday!</p>
+    </div>
+    <div class="sign">— Swati</div>
+  </section>
+
+  <!-- 5 -->
+  <section class="scene finale" data-scene="4" hidden>
+    <div class="eyebrow" id="cakeHint">Tap each candle to blow it out</div>
+    <div class="cake">
+      <div class="candles">
+        <button class="candle" aria-label="Candle 1"></button>
+        <button class="candle" aria-label="Candle 2"></button>
+        <button class="candle" aria-label="Candle 3"></button>
+      </div>
+      <div class="tier t2"></div>
+      <div class="tier t1"></div>
+    </div>
+    <div class="big" id="bigText">Make a wish…</div>
+  </section>
+
+  <div class="nav">
+    <button class="btn" id="back" hidden>← Back</button>
+    <button class="btn go" id="next" hidden>Next →</button>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C={};
+function readColors(){['asphalt','asphalt-2','line','fg','muted','lane','lidar','pink'].forEach(k=>C[k]=css('--'+k));}
+readColors();
+
+/* ---------- Scene navigation ---------- */
+const scenes=[...document.querySelectorAll('.scene')];
+const dots=[...document.querySelectorAll('.dots span')];
+const next=document.getElementById('next'), back=document.getElementById('back');
+let cur=0;
+function show(i){
+  if(window.__locked&&i>0)return;
+  cur=i;
+  scenes.forEach((s,k)=>s.hidden=k!==i);
+  dots.forEach((d,k)=>d.classList.toggle('on',k<=i));
+  back.hidden=i===0;
+  next.hidden=i===0||i===scenes.length-1;
+  next.textContent=i===scenes.length-2?'To the cake →':'Next →';
+  if(i===1) startIntro(); else stopIntro();
+  if(i===2) document.querySelectorAll('#facts li').forEach((li,k)=>{li.style.animation='none';li.offsetHeight;li.style.animation='';li.style.animationDelay=(k*0.45)+'s';});
+}
+document.getElementById('nameBtn').onclick=()=>show(1);
+next.onclick=()=>show(Math.min(cur+1,scenes.length-1));
+back.onclick=()=>show(Math.max(cur-1,0));
+
+/* ---------- Typed intro ---------- */
+let typeTimer=null;
+function typeIntro(){
+  const el=document.getElementById('typed');
+  const parts=[['A person who works in ',''],['game theory','em'],[' and ',''],['autonomous vehicles','em'],
+    [', teaching robots when to ',''],['chase','b'],[', when to ',''],['hide','b'],[', and how to ',''],['arrive at exactly the right angle','b'],['.','']];
+  const wrap=([s,g])=>g?`<${g}>${s}</${g}>`:s;
+  let pi=0,ci=0;
+  clearTimeout(typeTimer);
+  (function step(){
+    if(pi>=parts.length){el.innerHTML=parts.map(wrap).join('')+'<span class="caret"></span>';return;}
+    const [txt,tag]=parts[pi]; ci++;
+    el.innerHTML=parts.slice(0,pi).map(wrap).join('')+wrap([txt.slice(0,ci),tag])+'<span class="caret"></span>';
+    if(ci>=txt.length){pi++;ci=0;}
+    typeTimer=setTimeout(step,32);
+  })();
+}
+
+/* ---------- Paper panels ---------- */
+const PAPERS=[
+  {venue:'IEEE Control Systems Letters · 2025',
+   title:'Heterogeneous Pursuit of an Active Target Under Sensing Constraints',
+   plain:'A slow <b>sensor S</b> watches, a fast <b>attacker A</b> chases, and the <b>target T</b> changes direction every interval. The attacker steers by the <b>Apollonius circle</b>. Her result: if the target is slower than a critical speed, capture is guaranteed. Tonight, the target is a birthday present.',
+   legend:[['lidar','Sensor S and its sensing disk'],['lane','Attacker A'],['pink','Target T'],['fg','Apollonius circle']]},
+  {venue:'arXiv · 2026',
+   title:'Optimal Hiding with Partial Information of the Seeker’s Route',
+   plain:'The <b>Hider</b> hides a treasure, the <b>Seeker</b> searches along a route. After seeing the first part of the route, the Hider may move the treasure <b>once</b>, for a switching cost <b>c</b>. She measures what that peek is worth: the <b>value of information</b>.',
+   legend:[['lidar','Seeker'],['pink','Treasure (gift)'],['lane','Revealed route prefix'],['muted','Visited location']]},
+  {venue:'Aerospace Science and Technology · 2024',
+   title:'Polynomial Shaping Based Three-Dimensional Impact Angle and Field-of-View Constrained Guidance',
+   plain:'The line-of-sight is shaped as <b>cubic polynomials</b> of range, so the interceptor arrives with <b>zero miss distance</b> at the <b>chosen impact angle</b>, while the target never leaves the seeker’s <b>field of view</b>. Tonight’s payload: one birthday candle.',
+   legend:[['lane','Interceptor'],['lidar','Field-of-view cone'],['muted','Reference path'],['pink','Desired impact direction']]}
+];
+const tabs=[...document.querySelectorAll('.tab')];
+function setPanel(i){
+  const p=PAPERS[i];
+  tabs.forEach((t,k)=>{t.classList.toggle('on',k===i);t.setAttribute('aria-selected',k===i);});
+  document.getElementById('venue').textContent=p.venue;
+  document.getElementById('ptitle').textContent=p.title;
+  document.getElementById('pplain').innerHTML=p.plain;
+  document.getElementById('legend').innerHTML=p.legend.map(([c,l])=>`<span><i style="background:var(--${c})"></i>${l}</span>`).join('');
+}
+tabs.forEach(t=>t.onclick=()=>startAct(+t.dataset.act));
+
+/* ---------- Canvas engine ---------- */
+const cv=document.getElementById('field'), ctx=cv.getContext('2d');
+let W=300, raf=null, last=0, act=0, actT=0;
+const ACT_LEN=[8.5,9,8];
+function size(){const r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;W=r.width;cv.width=W*d;cv.height=W*d;ctx.setTransform(d,0,0,d,0,0);}
+window.addEventListener('resize',()=>{if(raf)size();});
+const X=v=>v*W;
+function label(txt,x,y,col,align){ctx.fillStyle=col;ctx.font='600 '+Math.max(10,W*0.03)+'px '+css('--mono');ctx.textAlign=align||'left';ctx.textBaseline='middle';ctx.fillText(txt,X(x),X(y));}
+function banner(txt,col){ctx.fillStyle=col;ctx.font='700 '+Math.max(11,W*0.034)+'px '+css('--mono');ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(txt,X(.04),X(.04));}
+function gift(x,y,s){
+  s=s||.034;
+  ctx.fillStyle=C.pink;ctx.fillRect(X(x-s/2),X(y-s/2),X(s),X(s));
+  ctx.fillStyle=C.lane;ctx.fillRect(X(x-s*0.08),X(y-s/2),X(s*0.16),X(s));ctx.fillRect(X(x-s/2),X(y-s*0.08),X(s),X(s*0.16));
+  ctx.strokeStyle=C.lane;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(X(x-s*0.22),X(y-s*0.62),X(s*0.2),X(s*0.12),-.4,0,7);ctx.ellipse(X(x+s*0.22),X(y-s*0.62),X(s*0.2),X(s*0.12),.4,0,7);ctx.stroke();
+}
+function dot(x,y,r,col){ctx.fillStyle=col;ctx.beginPath();ctx.arc(X(x),X(y),X(r),0,7);ctx.fill();}
+function tri(x,y,ang,col,s){
+  s=s||.03;ctx.save();ctx.translate(X(x),X(y));ctx.rotate(ang);ctx.fillStyle=col;
+  ctx.beginPath();ctx.moveTo(X(s),0);ctx.lineTo(X(-s*.7),X(s*.6));ctx.lineTo(X(-s*.4),0);ctx.lineTo(X(-s*.7),X(-s*.6));ctx.closePath();ctx.fill();ctx.restore();
+}
+function trail(pts,col,w){if(pts.length<2)return;ctx.strokeStyle=col;ctx.lineWidth=w||2;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(X(p.x),X(p.y)):ctx.moveTo(X(p.x),X(p.y)));ctx.stroke();}
+function grid(){ctx.fillStyle=C['asphalt-2'];ctx.fillRect(0,0,W,W);ctx.strokeStyle=C.line;ctx.lineWidth=1;ctx.globalAlpha=.5;for(let i=1;i<10;i++){ctx.beginPath();ctx.moveTo(X(i/10),0);ctx.lineTo(X(i/10),W);ctx.moveTo(0,X(i/10));ctx.lineTo(W,X(i/10));ctx.stroke();}ctx.globalAlpha=1;}
+
+/* Seeded RNG so every replay captures the same way */
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+
+/* ---- Act 1: sensor–attacker–target pursuit ---- */
+let P1;
+const vA=.15, vT=.075, vS=.035, RS=.6, DELTA=.9, MU=vT/vA;
+function reset1(){seed=7;P1={S:{x:.14,y:.86},A:{x:.26,y:.70},T:{x:.52,y:.46},h:-.7,nextSw:0,t:0,cap:false,capT:0,I:null,trA:[],trT:[],trS:[]};}
+function step1(dt){
+  const p=P1; if(p.cap){p.capT+=dt;return;}
+  p.t+=dt;
+  if(p.t>=p.nextSw){p.h=-.75+(rnd()-.5)*1.8;p.nextSw+=DELTA;}
+  const vt={x:vT*Math.cos(p.h),y:vT*Math.sin(p.h)};
+  p.T.x+=vt.x*dt;p.T.y+=vt.y*dt;
+  // attacker: minimum-time intercept assuming the current heading persists
+  const rx=p.T.x-p.A.x, ry=p.T.y-p.A.y;
+  const a=vT*vT-vA*vA, b=2*(rx*vt.x+ry*vt.y), c=rx*rx+ry*ry;
+  const ti=(-b-Math.sqrt(b*b-4*a*c))/(2*a);
+  p.I={x:p.T.x+vt.x*ti,y:p.T.y+vt.y*ti};
+  const dx=p.I.x-p.A.x, dy=p.I.y-p.A.y, dl=Math.hypot(dx,dy)||1;
+  p.A.x+=vA*dt*dx/dl;p.A.y+=vA*dt*dy/dl;
+  // sensor: head toward the target's predicted point
+  const sx=p.T.x+vt.x*1.2-p.S.x, sy=p.T.y+vt.y*1.2-p.S.y, sl=Math.hypot(sx,sy)||1;
+  p.S.x+=vS*dt*sx/sl;p.S.y+=vS*dt*sy/sl;
+  p.trA.push({...p.A});p.trT.push({...p.T});p.trS.push({...p.S});
+  if(Math.hypot(p.A.x-p.T.x,p.A.y-p.T.y)<.016){p.cap=true;}
+}
+function draw1(){
+  const p=P1; grid();
+  // sensing disk
+  ctx.fillStyle=C.lidar;ctx.globalAlpha=.08;ctx.beginPath();ctx.arc(X(p.S.x),X(p.S.y),X(RS),0,7);ctx.fill();ctx.globalAlpha=1;
+  ctx.strokeStyle=C.lidar;ctx.setLineDash([6,6]);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(X(p.S.x),X(p.S.y),X(RS),0,7);ctx.stroke();ctx.setLineDash([]);
+  label('Rˢ',p.S.x+RS*.72,p.S.y-RS*.72,C.lidar);
+  // Apollonius circle between A and T
+  if(!p.cap){
+    const m2=MU*MU, cx=(p.T.x-m2*p.A.x)/(1-m2), cy=(p.T.y-m2*p.A.y)/(1-m2), r=MU*Math.hypot(p.T.x-p.A.x,p.T.y-p.A.y)/(1-m2);
+    ctx.strokeStyle=C.fg;ctx.globalAlpha=.55;ctx.lineWidth=1.5;ctx.setLineDash([3,5]);ctx.beginPath();ctx.arc(X(cx),X(cy),X(r),0,7);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+    if(p.I){ctx.strokeStyle=C.lane;ctx.lineWidth=2;const s=.012;ctx.beginPath();ctx.moveTo(X(p.I.x-s),X(p.I.y-s));ctx.lineTo(X(p.I.x+s),X(p.I.y+s));ctx.moveTo(X(p.I.x+s),X(p.I.y-s));ctx.lineTo(X(p.I.x-s),X(p.I.y+s));ctx.stroke();}
+  }
+  trail(p.trS,C.lidar,1.5);trail(p.trA,C.lane,2);trail(p.trT,C.pink,2);
+  dot(p.S.x,p.S.y,.016,C.lidar);label('S',p.S.x+.03,p.S.y,C.lidar);
+  const ang=p.trA.length>1?Math.atan2(p.A.y-p.trA[p.trA.length-2].y,p.A.x-p.trA[p.trA.length-2].x):-.5;
+  if(!p.cap){tri(p.A.x,p.A.y,ang,C.lane);label('A',p.A.x-.05,p.A.y+.02,C.lane);}
+  gift(p.T.x,p.T.y);label('T',p.T.x+.035,p.T.y+.02,C.pink);
+  if(p.cap){
+    const k=Math.min(1,p.capT*2);ctx.strokeStyle=C.lane;ctx.globalAlpha=1-k*.6;ctx.lineWidth=3;ctx.beginPath();ctx.arc(X(p.T.x),X(p.T.y),X(.03+k*.08),0,7);ctx.stroke();ctx.globalAlpha=1;
+    banner('CAPTURED  ·  dᴬᵀ = 0  ·  μ < μ*',C.lane);
+    label('Gift delivered to Prajakta ✓',.5,.94,C.pink,'center');
+  } else {
+    banner('INTERVAL '+(Math.floor(p.t/DELTA)+1)+'  ·  μ = vᵀ/vᴬ = '+MU.toFixed(2),C.muted);
+  }
+}
+
+/* ---- Act 2: hide-and-seek with partial route reveal ---- */
+const NODES={O:{x:.10,y:.88},1:{x:.24,y:.38},2:{x:.52,y:.62},3:{x:.46,y:.20},4:{x:.86,y:.22},5:{x:.80,y:.74}};
+const ROUTE=['O','1','3','2','5','4'], REVEAL_AFTER=2;
+let P2;
+function reset2(){
+  const segs=[];let total=0;
+  for(let i=1;i<ROUTE.length;i++){const a=NODES[ROUTE[i-1]],b=NODES[ROUTE[i]],l=Math.hypot(b.x-a.x,b.y-a.y);segs.push({a,b,l,start:total});total+=l;}
+  P2={segs,total,revealS:segs[REVEAL_AFTER-1].start+segs[REVEAL_AFTER-1].l,s:0,pause:0,t:0,hide:'5'};
+}
+function posAt(s){const p=P2;for(const g of p.segs){if(s<=g.start+g.l){const k=(s-g.start)/g.l;return{x:g.a.x+(g.b.x-g.a.x)*k,y:g.a.y+(g.b.y-g.a.y)*k};}}return{...NODES['4']};}
+const SPEED2=.42, PAUSE2=1.6;
+function step2(dt){
+  const p=P2;p.t+=dt;if(p.t<.5)return;
+  if(p.s<p.revealS){p.s=Math.min(p.revealS,p.s+SPEED2*dt);}
+  else if(p.pause<PAUSE2){p.pause+=dt;}
+  else p.s=Math.min(p.total,p.s+SPEED2*dt);
+}
+function draw2(){
+  const p=P2;grid();
+  // full route, faint
+  ctx.strokeStyle=C.line;ctx.lineWidth=2;ctx.setLineDash([4,6]);ctx.beginPath();ROUTE.forEach((n,i)=>{const q=NODES[n];i?ctx.lineTo(X(q.x),X(q.y)):ctx.moveTo(X(q.x),X(q.y));});ctx.stroke();ctx.setLineDash([]);
+  // traveled
+  const pts=[{...NODES.O}];for(const g of p.segs){if(p.s>=g.start+g.l)pts.push({...g.b});else{pts.push(posAt(p.s));break;}}
+  trail(pts,C.lidar,2.5);
+  // revealed prefix highlight
+  const revealed=p.s>=p.revealS;
+  if(revealed){trail(ROUTE.slice(0,REVEAL_AFTER+1).map(n=>NODES[n]),C.lane,5);trail(pts.slice(0,REVEAL_AFTER+1),C.lidar,2.5);}
+  // nodes
+  const visited=new Set();for(const g of p.segs)if(p.s>=g.start+g.l-1e-6)visited.add(ROUTE[p.segs.indexOf(g)+1]);
+  Object.entries(NODES).forEach(([k,q])=>{
+    if(k==='O'){dot(q.x,q.y,.012,C.muted);label('O',q.x+.03,q.y,C.muted);return;}
+    ctx.lineWidth=2;ctx.strokeStyle=visited.has(k)?C.muted:C.fg;ctx.fillStyle=visited.has(k)?C.line:C['asphalt-2'];
+    ctx.beginPath();ctx.arc(X(q.x),X(q.y),X(.035),0,7);ctx.fill();ctx.stroke();
+    label(k,q.x,q.y,visited.has(k)?C.muted:C.fg,'center');
+  });
+  // treasure
+  let g=NODES['5'];
+  if(revealed){
+    const k=Math.min(1,p.pause/(PAUSE2*.8)), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    const a=NODES['5'],b=NODES['4'];
+    g={x:a.x+(b.x-a.x)*e,y:a.y+(b.y-a.y)*e-Math.sin(e*Math.PI)*.12};
+    if(k<1){ctx.strokeStyle=C.pink;ctx.setLineDash([3,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X(a.x),X(a.y));ctx.quadraticCurveTo(X((a.x+b.x)/2+.08),X((a.y+b.y)/2),X(b.x),X(b.y));ctx.stroke();ctx.setLineDash([]);}
+    if(p.pause>.2&&p.pause<PAUSE2+1.5)label('switch · cost c',.95,.47,C.pink,'right');
+  }
+  gift(g.x+.045,g.y-.045,.03);
+  // seeker
+  const sp=posAt(p.s);dot(sp.x,sp.y,.018,C.lidar);
+  const found=p.s>=p.total-1e-6;
+  if(found) {banner('FOUND at 4  ·  Hider gained by relocating',C.pink);label('VOI > c  →  switch was worth it',.5,.94,C.lane,'center');}
+  else if(revealed) banner('REVEAL · Hider sees prefix (1, 3)',C.lane);
+  else banner('SEARCHING · route (1, 3, 2, 5, 4)',C.muted);
+}
+
+/* ---- Act 3: polynomial-shaped, FOV-constrained guidance ---- */
+const B={p0:{x:.10,y:.80},p1:{x:.36,y:.42},p2:{x:.65,y:.311},p3:{x:.84,y:.64}};
+const SIGMA_MAX=50, IMPACT=60;
+let P3;
+function reset3(){P3={u:0,t:0,done:false,doneT:0};}
+function bez(u){const m=1-u;return{x:m*m*m*B.p0.x+3*m*m*u*B.p1.x+3*m*u*u*B.p2.x+u*u*u*B.p3.x,y:m*m*m*B.p0.y+3*m*m*u*B.p1.y+3*m*u*u*B.p2.y+u*u*u*B.p3.y};}
+function bezD(u){const m=1-u;return{x:3*m*m*(B.p1.x-B.p0.x)+6*m*u*(B.p2.x-B.p1.x)+3*u*u*(B.p3.x-B.p2.x),y:3*m*m*(B.p1.y-B.p0.y)+6*m*u*(B.p2.y-B.p1.y)+3*u*u*(B.p3.y-B.p2.y)};}
+function step3(dt){const p=P3;p.t+=dt;if(p.t<.4)return;if(!p.done){p.u=Math.min(1,p.u+dt/4.6);if(p.u>=1)p.done=true;}else p.doneT+=dt;}
+function miniCake(x,y,lit){
+  ctx.fillStyle=C.pink;ctx.fillRect(X(x-.07),X(y),X(.14),X(.06));
+  ctx.fillStyle=C.fg;ctx.fillRect(X(x-.05),X(y-.04),X(.10),X(.04));
+  if(lit){ctx.fillStyle=C.lidar;ctx.fillRect(X(x-.005),X(y-.09),X(.01),X(.05));
+    ctx.fillStyle=C.lane;ctx.beginPath();ctx.ellipse(X(x),X(y-.105),X(.009),X(.016),0,0,7);ctx.fill();}
+}
+function draw3(){
+  const p=P3;grid();
+  const T=B.p3, cakeTop={x:T.x,y:T.y+.0};
+  // desired impact direction
+  const ia=IMPACT*Math.PI/180;
+  ctx.strokeStyle=C.pink;ctx.lineWidth=1.5;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(X(T.x-Math.cos(ia)*.22),X(T.y-Math.sin(ia)*.22));ctx.lineTo(X(T.x),X(T.y));ctx.stroke();ctx.setLineDash([]);
+  ctx.strokeStyle=C.pink;ctx.beginPath();ctx.arc(X(T.x),X(T.y),X(.07),Math.PI,Math.PI+ia);ctx.stroke();
+  label('θ_imp = '+IMPACT+'°',T.x-.16,T.y-.03,C.pink,'right');
+  // reference path
+  ctx.strokeStyle=C.muted;ctx.globalAlpha=.6;ctx.lineWidth=1.5;ctx.setLineDash([4,6]);ctx.beginPath();for(let u=0;u<=1.001;u+=.02){const q=bez(u);u?ctx.lineTo(X(q.x),X(q.y)):ctx.moveTo(X(q.x),X(q.y));}ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  // traveled
+  const pts=[];for(let u=0;u<=p.u;u+=.01)pts.push(bez(u));pts.push(bez(p.u));trail(pts,C.lane,2.5);
+  miniCake(T.x,T.y+.005,p.done);
+  const pos=bez(p.u), d=bezD(Math.min(p.u,.999)), hd=Math.atan2(d.y,d.x);
+  if(!p.done){
+    // FOV cone
+    const sm=SIGMA_MAX*Math.PI/180, L=.24;
+    ctx.fillStyle=C.lidar;ctx.globalAlpha=.14;ctx.beginPath();ctx.moveTo(X(pos.x),X(pos.y));ctx.arc(X(pos.x),X(pos.y),X(L),hd-sm,hd+sm);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
+    ctx.strokeStyle=C.lidar;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(pos.x),X(pos.y));ctx.lineTo(X(pos.x+Math.cos(hd-sm)*L),X(pos.y+Math.sin(hd-sm)*L));ctx.moveTo(X(pos.x),X(pos.y));ctx.lineTo(X(pos.x+Math.cos(hd+sm)*L),X(pos.y+Math.sin(hd+sm)*L));ctx.stroke();
+    // LOS
+    ctx.strokeStyle=C.fg;ctx.globalAlpha=.35;ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(X(pos.x),X(pos.y));ctx.lineTo(X(T.x),X(T.y));ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+    tri(pos.x,pos.y,hd,C.lane,.032);
+    let sig=Math.abs((Math.atan2(T.y-pos.y,T.x-pos.x)-hd)*180/Math.PI);if(sig>180)sig=360-sig;
+    banner('LOOK ANGLE σ = '+sig.toFixed(0)+'°  ≤  σmax = '+SIGMA_MAX+'°',sig<=SIGMA_MAX?C.lidar:C.pink);
+    label('range r = '+Math.hypot(T.x-pos.x,T.y-pos.y).toFixed(2),.04,.12,C.muted);
+  } else {
+    const k=Math.min(1,p.doneT*1.5);ctx.strokeStyle=C.lane;ctx.globalAlpha=1-k*.7;ctx.lineWidth=3;ctx.beginPath();ctx.arc(X(T.x),X(T.y-.1),X(.02+k*.07),0,7);ctx.stroke();ctx.globalAlpha=1;
+    banner('IMPACT · miss = 0 · θ_imp = '+IMPACT+'° ✓',C.lane);
+    label('Candle placed. Target never left the FOV.',.5,.94,C.pink,'center');
+  }
+}
+
+const ACTS=[[reset1,step1,draw1],[reset2,step2,draw2],[reset3,step3,draw3]];
+function startAct(i){act=i;actT=0;ACTS[i][0]();setPanel(i);}
+function loop(now){
+  const dt=Math.min(.05,(now-(last||now))/1000);last=now;
+  actT+=dt;ACTS[act][1](dt);ACTS[act][2]();
+  if(actT>ACT_LEN[act])startAct((act+1)%3);
+  raf=requestAnimationFrame(loop);
+}
+function startIntro(){readColors();size();startAct(0);last=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);typeIntro();}
+function stopIntro(){cancelAnimationFrame(raf);raf=null;clearTimeout(typeTimer);}
+
+/* ---------- Cake + confetti ---------- */
+const candles=[...document.querySelectorAll('.candle')];
+candles.forEach(cn=>cn.onclick=()=>{
+  cn.classList.add('out');
+  if(candles.every(x=>x.classList.contains('out'))){
+    document.getElementById('bigText').innerHTML='Happy Birthday, <span>Prajakta!</span>';
+    document.getElementById('cakeHint').textContent='Wish captured · equilibrium reached';
+    confetti(); if(!playing) toggleMusic();
+  }
+});
+const cf=document.getElementById('confetti'), cx=cf.getContext('2d');
+function confetti(){
+  const d=window.devicePixelRatio||1; cf.width=innerWidth*d; cf.height=innerHeight*d; cx.setTransform(d,0,0,d,0,0);
+  const cols=[C.pink,C.lane,C.lidar,C.fg];
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ps=Array.from({length:reduce?40:180},()=>({x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*3,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,w:6+Math.random()*6,c:cols[Math.random()*4|0]}));
+  let n=0;
+  (function f(){
+    cx.clearRect(0,0,innerWidth,innerHeight);
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-3,p.w,6);cx.restore();});
+    if(++n<360) requestAnimationFrame(f); else cx.clearRect(0,0,innerWidth,innerHeight);
+  })();
+}
+
+/* ---------- Music: Happy Birthday melody (public domain), synthesized ---------- */
+const mBtn=document.getElementById('music');
+let ac=null,playing=false,timer=null;
+const N={G4:392,A4:440,B4:493.88,C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99};
+const song=[['G4',.75],['G4',.25],['A4',1],['G4',1],['C5',1],['B4',2],
+            ['G4',.75],['G4',.25],['A4',1],['G4',1],['D5',1],['C5',2],
+            ['G4',.75],['G4',.25],['G5',1],['E5',1],['C5',1],['B4',1],['A4',2],
+            ['F5',.75],['F5',.25],['E5',1],['C5',1],['D5',1],['C5',3]];
+function playSong(){
+  const beat=.42; let t=ac.currentTime+.05;
+  song.forEach(([n,d])=>{
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type='triangle';o.frequency.value=N[n];
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+d*beat*.95);
+    o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d*beat);
+    t+=d*beat;
+  });
+  timer=setTimeout(()=>{if(playing)playSong();},(t-ac.currentTime+1.2)*1000);
+}
+function toggleMusic(){
+  try{
+    playing=!playing;
+    mBtn.setAttribute('aria-pressed',playing);
+    mBtn.textContent=playing?'♪ Pause song':'♪ Play song';
+    if(playing){ac=new (window.AudioContext||window.webkitAudioContext)();playSong();}
+    else {clearTimeout(timer);if(ac){ac.close();ac=null;}}
+  }catch(e){mBtn.textContent='♪ Sound unavailable';}
+}
+mBtn.onclick=toggleMusic;
+
+/* Countdown to midnight IST on 10 November, shown only before it */
+(function(){
+  const el=document.getElementById('bday');
+  const target=Date.UTC(2026,10,9,18,30,0); // 10 Nov 2026 00:00 IST
+  const btn=document.getElementById('nameBtn'), lead=document.querySelector('[data-scene="0"] .lead'), hint=document.querySelector('.hint');
+  const leadText=lead.textContent, hintText=hint.textContent;
+  function tick(){
+    const ms=target-Date.now();
+    if(ms<=0){
+      window.__locked=false;btn.disabled=false;btn.style.opacity='';btn.style.cursor='';
+      el.textContent='10 · November · Birthday mode: on';lead.textContent=leadText;hint.textContent=hintText;return;
+    }
+    window.__locked=true;btn.disabled=true;btn.style.opacity='.35';btn.style.cursor='not-allowed';
+    const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),sec=s%60;
+    el.textContent='Locked until 12:00 am · 10 November';
+    lead.textContent='Something is waiting for you. Come back at midnight.';
+    hint.textContent='Opens in '+(h?h+':':'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+    setTimeout(tick,1000);
+  }
+  tick();
+})();
+
+show(0);
+})();
+</script>
